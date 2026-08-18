@@ -39,7 +39,7 @@ export const ALL_TARO_PLATFORMS: GeneratePlatform[] = [
 ];
 
 export const STANDALONE_PLATFORMS: StandalonePlatform[] = [
-  'h5',
+  'web',
   'rn',
   'weapp',
   'alipay',
@@ -49,16 +49,28 @@ export const STANDALONE_PLATFORMS: StandalonePlatform[] = [
   'kuaishou',
 ];
 
-const ALIASES: Record<string, GeneratePlatform> = {
+const CLI_ALIASES: Record<string, GeneratePlatform> = {
   wechat: 'weapp',
   baidu: 'swan',
   toutiao: 'tt',
+  h5: 'web',
 };
 
-export const canonicalizePlatform = (value: string): GeneratePlatform => {
+const TARO_ALIASES: Record<string, GeneratePlatform> = {
+  wechat: 'weapp',
+  baidu: 'swan',
+  toutiao: 'tt',
+  web: 'h5',
+};
+
+export const canonicalizePlatform = (
+  value: string,
+  context: 'cli' | 'taro' = 'cli',
+): GeneratePlatform => {
   const key = value.trim().toLowerCase();
-  if (key in ALIASES) {
-    return ALIASES[key];
+  const aliases = context === 'taro' ? TARO_ALIASES : CLI_ALIASES;
+  if (key in aliases) {
+    return aliases[key];
   }
   return key as GeneratePlatform;
 };
@@ -68,13 +80,13 @@ const parsePlatforms = (raw: unknown): GeneratePlatform[] => {
     return [...ALL_TARO_PLATFORMS];
   }
   if (Array.isArray(raw)) {
-    return [...new Set(raw.map((item) => canonicalizePlatform(String(item))))];
+    return [...new Set(raw.map((item) => canonicalizePlatform(String(item), 'taro')))];
   }
   if (typeof raw === 'string' && raw.trim()) {
     if (raw.trim() === '*') {
       return [...ALL_TARO_PLATFORMS];
     }
-    return [...new Set(raw.split(',').map((item) => canonicalizePlatform(item)))];
+    return [...new Set(raw.split(',').map((item) => canonicalizePlatform(item, 'taro')))];
   }
   return [];
 };

@@ -20,7 +20,7 @@ export interface XmlData {
 export type XmlSymbol = SvgSymbol;
 
 export type StandalonePlatform =
-  | 'h5'
+  | 'web'
   | 'rn'
   | 'weapp'
   | 'alipay'
@@ -29,7 +29,7 @@ export type StandalonePlatform =
   | 'qq'
   | 'kuaishou';
 
-export type GeneratePlatform = StandalonePlatform | 'taro';
+export type GeneratePlatform = StandalonePlatform | 'h5' | 'taro';
 
 export interface KitConfig {
   symbol_url?: string;

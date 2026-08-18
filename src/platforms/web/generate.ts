@@ -5,7 +5,7 @@ import { emptyDir, ensureDir, writeText } from '../../core/fs.js';
 import { pascalCase, trimIconPrefix } from '../../core/names.js';
 import { renderJsxSvg } from '../../core/svg.js';
 import { renderGetIconColor, renderGetIconColorDts } from '../../emit/helper.js';
-import { renderH5Index, renderH5IndexDts, renderH5SingleIcon, renderH5SingleIconDts } from '../../emit/h5.js';
+import { renderWebIndex, renderWebIndexDts, renderWebSingleIcon, renderWebSingleIconDts } from '../../emit/web.js';
 import { renderSwitchCases } from '../../emit/shared.js';
 
 const generateCase = (symbol: SvgSymbol, unit: string): string =>
@@ -17,7 +17,7 @@ const generateCase = (symbol: SvgSymbol, unit: string): string =>
     camelCaseFill: true,
   });
 
-export const generateH5 = (data: XmlData, config: KitConfig): void => {
+export const generateWeb = (data: XmlData, config: KitConfig): void => {
   const names: string[] = [];
   const components: string[] = [];
   const saveDir = resolve(config.save_dir);
@@ -43,7 +43,7 @@ export const generateH5 = (data: XmlData, config: KitConfig): void => {
 
     writeText(
       join(saveDir, componentName + jsxExtension),
-      renderH5SingleIcon({
+      renderWebSingleIcon({
         ts: config.use_typescript,
         componentName,
         size: config.default_icon_size,
@@ -52,7 +52,7 @@ export const generateH5 = (data: XmlData, config: KitConfig): void => {
     );
 
     if (!config.use_typescript) {
-      writeText(join(saveDir, `${componentName}.d.ts`), renderH5SingleIconDts(componentName));
+      writeText(join(saveDir, `${componentName}.d.ts`), renderWebSingleIconDts(componentName));
     }
 
     console.log(`${pc.green('√')} Generated icon "${pc.yellow(item.id)}"`);
@@ -61,7 +61,7 @@ export const generateH5 = (data: XmlData, config: KitConfig): void => {
   const cases = renderSwitchCases(entries);
   writeText(
     join(saveDir, `index${jsxExtension}`),
-    renderH5Index({
+    renderWebIndex({
       ts: config.use_typescript,
       names,
       components,
@@ -70,7 +70,7 @@ export const generateH5 = (data: XmlData, config: KitConfig): void => {
   );
 
   if (!config.use_typescript) {
-    writeText(join(saveDir, 'index.d.ts'), renderH5IndexDts({ names, components }));
+    writeText(join(saveDir, 'index.d.ts'), renderWebIndexDts({ names, components }));
   }
 
   console.log(`\n${pc.green('√')} All icons have been put into dir: ${pc.green(config.save_dir)}\n`);

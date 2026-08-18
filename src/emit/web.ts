@@ -1,6 +1,6 @@
 import { ESLINT_BANNER, renderImports, renderReExports, unionNames } from './shared.js';
 
-export const renderH5SingleIcon = (opts: {
+export const renderWebSingleIcon = (opts: {
   ts: boolean;
   componentName: string;
   size: number;
@@ -49,7 +49,7 @@ export default ${opts.componentName};
 `;
 };
 
-export const renderH5SingleIconDts = (componentName: string): string => `${ESLINT_BANNER}
+export const renderWebSingleIconDts = (componentName: string): string => `${ESLINT_BANNER}
 import type { SVGAttributes, FunctionComponent } from 'react';
 
 interface Props extends Omit<SVGAttributes<SVGElement>, 'color'> {
@@ -62,7 +62,7 @@ declare const ${componentName}: FunctionComponent<Props>;
 export default ${componentName};
 `;
 
-export const renderH5Index = (opts: {
+export const renderWebIndex = (opts: {
   ts: boolean;
   names: string[];
   components: string[];
@@ -113,7 +113,7 @@ export default IconFont;
 `;
 };
 
-export const renderH5IndexDts = (opts: { names: string[]; components: string[] }): string => `${ESLINT_BANNER}
+export const renderWebIndexDts = (opts: { names: string[]; components: string[] }): string => `${ESLINT_BANNER}
 import type { SVGAttributes, FunctionComponent } from 'react';
 ${renderReExports(opts.components)}
 

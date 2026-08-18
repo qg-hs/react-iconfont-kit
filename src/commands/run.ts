@@ -4,7 +4,7 @@ import pc from 'picocolors';
 import { fetchXml } from '../core/fetchXml.js';
 import { assertSource, canonicalizePlatform, DEFAULT_CONFIG_FILE, loadConfig } from '../core/getConfig.js';
 import type { GeneratePlatform, KitConfig, XmlData } from '../core/types.js';
-import { generateH5 } from '../platforms/h5/generate.js';
+import { generateWeb } from '../platforms/web/generate.js';
 import { generateMP, MP_PLATFORMS } from '../platforms/mp/generate.js';
 import { generateRN } from '../platforms/rn/generate.js';
 import { generateTaro } from '../platforms/taro/generate.js';
@@ -49,9 +49,9 @@ export const runGenerate = async (options: { config?: string; platform?: string 
 
     const platform = canonicalizePlatform(platformArg);
 
-    if (platform === 'h5') {
-      assertSource(config, 'h5');
-      generateH5(await loadXml(config, 'h5'), config);
+    if (platform === 'web') {
+      assertSource(config, 'web');
+      generateWeb(await loadXml(config, 'web'), config);
       return;
     }
 

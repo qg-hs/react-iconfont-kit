@@ -1,7 +1,7 @@
 {
   "name": "react-iconfont-kit",
   "version": "1.0.2",
-  "description": "Generate React / React Native / Mini Program / Taro icon components from iconfont.cn",
+  "description": "Generate React web / React Native / Mini Program / Taro icon components from iconfont.cn",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

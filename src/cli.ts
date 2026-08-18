@@ -34,7 +34,7 @@ const generate = defineCommand({
     },
     platform: {
       type: 'string',
-      description: 'h5 | rn | weapp | alipay | swan | tt | qq | kuaishou | taro（默认 taro）',
+      description: 'web | rn | weapp | alipay | swan | tt | qq | kuaishou | taro（默认 taro）',
       alias: 'p',
     },
   },
@@ -46,7 +46,7 @@ const generate = defineCommand({
 const main = defineCommand({
   meta: {
     name: 'iconfont',
-    description: 'Generate React / RN / Mini Program / Taro icons from iconfont.cn',
+    description: 'Generate React web / RN / Mini Program / Taro icons from iconfont.cn',
   },
   subCommands: {
     init,

@@ -1,6 +1,6 @@
 # react-iconfont-kit
 
-把 [iconfont.cn](https://www.iconfont.cn) 的 symbol 图标转成组件：React H5、React Native、各家小程序、Taro。不依赖字体，支持多色彩。
+把 [iconfont.cn](https://www.iconfont.cn) 的 symbol 图标转成组件：React web、React Native、各家小程序、Taro。不依赖字体，支持多色彩。
 
 ## 安装
 
@@ -46,7 +46,7 @@ npx iconfont init --output iconfont.json
 按平台生成：
 
 ```bash
-npx iconfont generate --platform h5
+npx iconfont generate --platform web
 npx iconfont generate --platform rn
 npx iconfont generate --platform weapp
 npx iconfont generate --platform alipay
@@ -60,12 +60,12 @@ npx iconfont generate --platform taro
 指定配置文件：
 
 ```bash
-npx iconfont generate --platform h5 --config ./iconfont.json
+npx iconfont generate --platform web --config ./iconfont.json
 ```
 
 不写 `--platform` 时等同于 `taro`：按 `platforms` 一次生成多端，并带上 `index.weapp.tsx` 等包装文件。
 
-`wechat` / `baidu` / `toutiao` 会分别映射到 `weapp` / `swan` / `tt`。
+`wechat` / `baidu` / `toutiao` 会分别映射到 `weapp` / `swan` / `tt`。`--platform h5` 等同于 `web`。
 
 ## 配置
 
@@ -76,11 +76,11 @@ npx iconfont generate --platform h5 --config ./iconfont.json
 | `use_typescript` | `true` 生成 `.tsx`，否则 `.js` + `.d.ts` |
 | `trim_icon_prefix` | 从 `<Icon name>` 里去掉的前缀 |
 | `default_icon_size` | 默认尺寸 |
-| `unit` | 仅 H5：`px` / `rem` |
+| `unit` | 仅 React web：`px` / `rem` |
 | `use_rpx` | 小程序 / Taro 是否按 rpx 换算 |
-| `design_width` | Taro H5 + rpx 时的设计稿宽度 |
+| `design_width` | Taro 的 h5 端 + rpx 时的设计稿宽度 |
 | `local_svgs` | 仅 RN：额外本地 SVG 目录（可补渐变） |
-| `platforms` | Taro 用。`*` 或 `["weapp","h5","rn"]`。`*` 含 weapp / alipay / swan / tt / qq / kuaishou / h5 / rn |
+| `platforms` | Taro 用。`*` 或 `["weapp","h5","rn"]`。`*` 含 weapp / alipay / swan / tt / qq / kuaishou / h5 / rn。这里的 `h5` 是 Taro 端名 |
 
 ## 调用
 
@@ -95,7 +95,7 @@ import IconAlipay from './components/iconfont/IconAlipay';
 <IconAlipay size={20} className="my-icon" style={{ marginRight: 8 }} />
 ```
 
-H5 / 小程序 / Taro 支持 `style` 和 `className`。React Native 只支持 `style`。
+React web / 小程序 / Taro 支持 `style` 和 `className`。React Native 只支持 `style`。
 
 Taro 3 需要在 `src/app.config.js` 注册：
 

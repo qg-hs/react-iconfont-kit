@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { after, describe, it } from 'node:test';
 import { parseSymbolXml } from '../core/fetchXml.js';
 import type { KitConfig } from '../core/types.js';
-import { generateH5 } from '../platforms/h5/generate.js';
+import { generateWeb } from '../platforms/web/generate.js';
 import { generateMP } from '../platforms/mp/generate.js';
 import { MP_PLATFORMS, renderMpJs } from './mp.js';
 import { renderTaroHelper } from './taro.js';
@@ -74,11 +74,11 @@ describe('emit helpers', () => {
   });
 });
 
-describe('generateH5', () => {
+describe('generateWeb', () => {
   it('writes typed components with style and className', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'iconfont-h5-'));
+    const dir = mkdtempSync(join(tmpdir(), 'iconfont-web-'));
     tmpDirs.push(dir);
-    generateH5(parseSymbolXml(FIXTURE), config(dir));
+    generateWeb(parseSymbolXml(FIXTURE), config(dir));
 
     const single = readFileSync(join(dir, 'IconAlipay.tsx'), 'utf8');
     assert.match(single, /className=\{className\}/);

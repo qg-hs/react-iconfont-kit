@@ -14,7 +14,7 @@ import {
   renderTaroPlatformWrapper,
   renderTaroRnWrapper,
 } from '../../emit/taro.js';
-import { generateH5 } from '../h5/generate.js';
+import { generateWeb } from '../web/generate.js';
 import { generateMP, MP_PLATFORMS } from '../mp/generate.js';
 import { generateRN } from '../rn/generate.js';
 
@@ -86,7 +86,7 @@ export const generateTaro = (data: XmlData, config: KitConfig): void => {
     const nested = withSaveDir(config, platform);
 
     if (platform === 'h5') {
-      generateH5(data, { ...nested, unit: config.use_rpx ? 'rem' : 'px' });
+      generateWeb(data, { ...nested, unit: config.use_rpx ? 'rem' : 'px' });
       stripNestedDts(nested.save_dir);
     } else if (platform === 'rn') {
       generateRN(data, nested);
