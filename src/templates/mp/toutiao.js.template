@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 Component({
   properties: {
     // #names#
@@ -23,6 +25,14 @@ Component({
           svgSize: #rpx-1:size / 750 * tt.getSystemInfoSync().windowWidth:##rpx-0:size:#,
         });
       },
+    },
+    className: {
+      type: String,
+      value: '',
+    },
+    customStyle: {
+      type: String,
+      value: '',
     },
   },
   data: {

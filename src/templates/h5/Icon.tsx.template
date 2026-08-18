@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import React, { SVGAttributes, FunctionComponent } from 'react';
+import type { SVGAttributes, FunctionComponent } from 'react';
 #imports#
 #exports#
 
@@ -16,9 +16,9 @@ interface Props extends Omit<SVGAttributes<SVGElement>, 'color'> {
 const IconFont: FunctionComponent<Props> = ({ name, ...rest }) => {
   switch (name) {
 #cases#
+    default:
+      return null;
   }
-
-  return null;
 };
 
 export default IconFont;

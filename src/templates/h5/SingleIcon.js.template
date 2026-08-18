@@ -1,20 +1,16 @@
 /* eslint-disable */
 
-import React from 'react';
 import { getIconColor } from './helper';
 
 const DEFAULT_STYLE = {
   display: 'block',
 };
 
-const #componentName# = ({ size, color, style: _style, ...rest }) => {
+const #componentName# = ({ size = #size#, color, style: _style, className, ...rest }) => {
   const style = _style ? { ...DEFAULT_STYLE, ..._style } : DEFAULT_STYLE;
 
+  /* prettier-ignore */
   return (#iconContent#  );
-};
-
-#componentName#.defaultProps = {
-  size: #size#,
 };
 
 export default #componentName#;

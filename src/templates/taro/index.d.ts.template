@@ -1,11 +1,13 @@
 /* eslint-disable */
-import React, { FunctionComponent } from 'react';
+
+import type { CSSProperties, FunctionComponent } from 'react';
 
 interface Props {
   name: '#names#';
   size?: number;
   color?: string | string[];
-  style?: React.CSSProperties;
+  style?: CSSProperties;
+  className?: string;
 }
 
 declare const IconFont: FunctionComponent<Props>;

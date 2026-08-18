@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import React, { FunctionComponent } from 'react';
+import type { CSSProperties, FunctionComponent } from 'react';
 #rpx-1:import Taro from '@tarojs/taro';:#
 
 export type IconNames = '#names#';
@@ -10,18 +10,14 @@ interface Props {
   name: IconNames;
   size?: number;
   color?: string | string[];
-  style?: React.CSSProperties;
+  style?: CSSProperties | string;
+  className?: string;
 }
 
-const IconFont: FunctionComponent<Props> = (props) => {
-  const { name, size, color, style } = props;
-
-  // @ts-ignore
-  return <iconfont name={name} size={#rpx-1:parseFloat(Taro.pxTransform(size)):##rpx-0:size:#} color={color} style={style} />;
-};
-
-IconFont.defaultProps = {
-  size: #size#,
+const IconFont: FunctionComponent<Props> = ({ name, size = #size#, color, style, className, ...rest }) => {
+  const customStyle = typeof style === 'string' ? style : '';
+  // @ts-expect-error native mini-program component
+  return <iconfont name={name} size={#rpx-1:parseFloat(Taro.pxTransform(size)):##rpx-0:size:#} color={color} style={style} className={className} customStyle={customStyle} {...rest} />;
 };
 
 export default IconFont;

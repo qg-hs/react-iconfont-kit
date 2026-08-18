@@ -7,11 +7,8 @@
  * @return {string}
  */
 export const getIconColor = (color, index, defaultColor) => {
-  return color
-    ? (
-      typeof color === 'string'
-        ? color
-        : color[index] || defaultColor
-    )
-    : defaultColor;
+  if (!color) {
+    return defaultColor;
+  }
+  return typeof color === 'string' ? color : color[index] || defaultColor;
 };

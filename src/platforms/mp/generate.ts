@@ -92,7 +92,7 @@ export const generateMP = (data: XmlData, config: KitConfig, platformId: string)
     names.push(iconIdAfterTrim);
     svgTemplates.push(
       `<!--${iconIdAfterTrim}-->\n<view ${spec.ifAttr}="{{name === '${iconIdAfterTrim}'}}" style="background-image: url({{quot}}data:image/svg+xml, ${generateCase(item, spec.hexToRgb)}{{quot}});` +
-        ' width: {{svgSize}}px; height: {{svgSize}}px; " class="icon" />',
+        ' width: {{svgSize}}px; height: {{svgSize}}px; {{customStyle}}" class="icon {{className}}" />',
     );
     console.log(`${pc.green('√')} Generated icon "${pc.yellow(iconId)}"`);
   }

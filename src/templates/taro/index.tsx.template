@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import React, { FunctionComponent } from 'react';
+import type { CSSProperties, FunctionComponent } from 'react';
 
 export type IconNames = '#names#';
 
@@ -9,7 +9,8 @@ export interface IconProps {
   name: IconNames;
   size?: number;
   color?: string | string[];
-  style?: React.CSSProperties;
+  style?: CSSProperties;
+  className?: string;
 }
 
 const IconFont: FunctionComponent<IconProps> = () => {

@@ -1,16 +1,10 @@
 /* eslint-disable */
 
-import React from 'react';
 #rpx-1:import Taro from '@tarojs/taro';:#
 
-const IconFont = (props) => {
-  const { name, size, color, style } = props;
-
-  return <iconfont name={name} size={#rpx-1:parseFloat(Taro.pxTransform(size)):##rpx-0:size:#} color={color} style={style} />;
-};
-
-IconFont.defaultProps = {
-  size: #size#,
+const IconFont = ({ name, size = #size#, color, style, className, ...rest }) => {
+  const customStyle = typeof style === 'string' ? style : '';
+  return <iconfont name={name} size={#rpx-1:parseFloat(Taro.pxTransform(size)):##rpx-0:size:#} color={color} style={style} className={className} customStyle={customStyle} {...rest} />;
 };
 
 export default IconFont;

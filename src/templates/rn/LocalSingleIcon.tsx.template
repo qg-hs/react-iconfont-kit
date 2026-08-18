@@ -1,8 +1,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import React, { FunctionComponent } from 'react';
-import { ViewProps } from 'react-native';
+import { memo } from 'react';
+import type { FunctionComponent } from 'react';
+import type { ViewProps } from 'react-native';
 #svgComponents#
 
 interface Props extends GProps, ViewProps {
@@ -12,14 +13,9 @@ interface Props extends GProps, ViewProps {
 
 #xml#
 
-let #componentName#: FunctionComponent<Props> = ({ size, color, ...rest }) => {
+const #componentName#: FunctionComponent<Props> = ({ size = #size#, ...rest }) => {
+  /* prettier-ignore */
   return (#iconContent#  );
 };
 
-#componentName#.defaultProps = {
-  size: #size#,
-};
-
-#componentName# = React.memo ? React.memo(#componentName#) : #componentName#;
-
-export default #componentName#;
+export default memo(#componentName#);

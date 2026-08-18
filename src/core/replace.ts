@@ -36,11 +36,17 @@ export const replaceExports = (content: string, exported: string[]): string =>
 export const replaceSizeUnit = (content: string, unit: string): string =>
   content.replace(/\{size\}/g, `{size + '${unit}'}`);
 
+const SVG_TYPE_ONLY = new Set(['GProps']);
+
 export const replaceSvgComponents = (content: string, components: Set<string>): string => {
   const used = Array.from(components);
+  if (!used.length) {
+    return content.replace(/#svgComponents#/g, '');
+  }
+  const names = used.map((name) => (SVG_TYPE_ONLY.has(name) ? `type ${name}` : name));
   return content.replace(
     /#svgComponents#/g,
-    used.length ? `import { ${used.join(', ')} } from 'react-native-svg';` : '',
+    `import { ${names.join(', ')} } from 'react-native-svg';`,
   );
 };
 

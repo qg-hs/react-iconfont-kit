@@ -1,17 +1,16 @@
 /* eslint-disable */
 
-import React from 'react';
+import { memo } from 'react';
 #svgComponents#
 #imports#
 #exports#
 
-let IconFont = ({ name, ...rest }) => {
+const IconFont = ({ name, ...rest }) => {
   switch (name) {
-#cases#  }
-
-  return null;
+#cases#
+    default:
+      return null;
+  }
 };
 
-IconFont = React.memo ? React.memo(IconFont) : IconFont;
-
-export default IconFont;
+export default memo(IconFont);

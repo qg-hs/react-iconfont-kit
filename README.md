@@ -91,7 +91,8 @@ import IconAlipay from './components/iconfont/IconAlipay';
 <IconFont name="alipay" size={20} />
 <IconFont name="alipay" color="green" />
 <IconFont name="alipay" color={['green', 'orange']} />
-<IconAlipay size={20} />
+<IconFont name="alipay" className="my-icon" style={{ marginRight: 8 }} />
+<IconAlipay size={20} className="my-icon" style={{ marginRight: 8 }} />
 ```
 
 Taro 3 需要在 `src/app.config.js` 注册：
@@ -103,6 +104,12 @@ export default {
   usingComponents: Object.assign(useGlobalIconFont()),
 };
 ```
+
+## ESLint / TypeScript / Prettier
+
+生成文件顶部带 `/* eslint-disable */`，组件用参数默认值而不是 `defaultProps`（React 19 不再给函数组件挂 defaultProps）。类型用 `import type`，避免 `verbatimModuleSyntax` 报未使用的值导入。
+
+SVG 路径很长时，Prettier 仍可能改文件。把 `save_dir` 加进 `.prettierignore` 和 ESLint `ignorePatterns` 即可。
 
 ## 兼容命令
 

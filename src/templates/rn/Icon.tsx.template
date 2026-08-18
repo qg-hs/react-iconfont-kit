@@ -1,8 +1,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import React, { FunctionComponent } from 'react';
-import { ViewProps } from 'react-native';
+import { memo } from 'react';
+import type { FunctionComponent } from 'react';
+import type { ViewProps } from 'react-native';
 #svgComponents#
 #imports#
 #exports#
@@ -15,13 +16,12 @@ interface Props extends GProps, ViewProps {
   color?: string | string[];
 }
 
-let IconFont: FunctionComponent<Props> = ({ name, ...rest }) => {
+const IconFont: FunctionComponent<Props> = ({ name, ...rest }) => {
   switch (name) {
-#cases#  }
-
-  return null;
+#cases#
+    default:
+      return null;
+  }
 };
 
-IconFont = React.memo ? React.memo(IconFont) : IconFont;
-
-export default IconFont;
+export default memo(IconFont);

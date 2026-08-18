@@ -1,17 +1,12 @@
 /* eslint-disable */
 
-import React from 'react';
+import { memo } from 'react';
 #svgComponents#
 #helper#
 
-let #componentName# = ({ size, color, ...rest }) => {
+const #componentName# = ({ size = #size#, color, ...rest }) => {
+  /* prettier-ignore */
   return (#iconContent#  );
 };
 
-#componentName#.defaultProps = {
-  size: #size#,
-};
-
-#componentName# = React.memo ? React.memo(#componentName#) : #componentName#;
-
-export default #componentName#;
+export default memo(#componentName#);

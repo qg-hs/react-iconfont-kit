@@ -19,7 +19,7 @@ import { addJsxAttribute, eachChild } from '../../core/svg.js';
 import { whitespace } from '../../core/whitespace.js';
 
 const generateCase = (data: XmlSymbol, baseIdent: number): string => {
-  let template = `\n${whitespace(baseIdent)}<svg viewBox="${data.$.viewBox}" width={size} height={size} style={style} {...rest}>\n`;
+  let template = `\n${whitespace(baseIdent)}<svg viewBox="${data.$.viewBox}" width={size} height={size} className={className} style={style} {...rest}>\n`;
 
   const counter = { colorIndex: 0, baseIdent };
   eachChild(data, (domName, sub) => {

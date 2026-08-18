@@ -1,15 +1,14 @@
 /* eslint-disable */
 
-import React from 'react';
 #imports#
 #exports#
 
 const IconFont = ({ name, ...rest }) => {
   switch (name) {
 #cases#
+    default:
+      return null;
   }
-
-  return null;
 };
 
 export default IconFont;
