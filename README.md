@@ -2,8 +2,6 @@
 
 把 [iconfont.cn](https://www.iconfont.cn) 的 symbol 图标转成组件：React H5、React Native、各家小程序、Taro。不依赖字体，支持多色彩。
 
-由 `react-iconfont-cli` / `react-native-iconfont-cli` / `mini-program-iconfont-cli` / `taro-iconfont-cli` 合并而来。
-
 ## 安装
 
 ```bash
@@ -21,10 +19,12 @@ Taro 项目把 `@tarojs/taro` 当作 peer。
 ## 使用
 
 ```bash
-npx iconfont-init
+npx iconfont init
 # 或指定路径
-npx iconfont-init --output iconfont.json
+npx iconfont init --output iconfont.json
 ```
+
+`iconfont-kit` 和 `iconfont` 是同一个命令。
 
 生成的 `iconfont.json`：
 
@@ -46,26 +46,26 @@ npx iconfont-init --output iconfont.json
 按平台生成：
 
 ```bash
-npx iconfont-h5
-npx iconfont-rn
-npx iconfont-wechat
-npx iconfont-alipay
-npx iconfont-baidu
-npx iconfont-toutiao
-npx iconfont-qq
-npx iconfont-kuaishou
-npx iconfont-taro
+npx iconfont generate --platform h5
+npx iconfont generate --platform rn
+npx iconfont generate --platform weapp
+npx iconfont generate --platform alipay
+npx iconfont generate --platform swan
+npx iconfont generate --platform tt
+npx iconfont generate --platform qq
+npx iconfont generate --platform kuaishou
+npx iconfont generate --platform taro
 ```
 
-统一入口：
+指定配置文件：
 
 ```bash
-npx iconfont init
-npx iconfont generate --platform h5
-npx iconfont generate --platform taro --config ./iconfont.json
+npx iconfont generate --platform h5 --config ./iconfont.json
 ```
 
-`iconfont-taro` / `--platform taro` 会按 `platforms` 一次生成多端，并带上 Taro 的 `index.weapp.tsx` 等包装文件。
+不写 `--platform` 时等同于 `taro`：按 `platforms` 一次生成多端，并带上 `index.weapp.tsx` 等包装文件。
+
+`wechat` / `baidu` / `toutiao` 会分别映射到 `weapp` / `swan` / `tt`。
 
 ## 配置
 
@@ -80,7 +80,7 @@ npx iconfont generate --platform taro --config ./iconfont.json
 | `use_rpx` | 小程序 / Taro 是否按 rpx 换算 |
 | `design_width` | Taro H5 + rpx 时的设计稿宽度 |
 | `local_svgs` | 仅 RN：额外本地 SVG 目录（可补渐变） |
-| `platforms` | Taro 用。`*` 或 `["weapp","h5","rn"]` |
+| `platforms` | Taro 用。`*` 或 `["weapp","h5","rn"]`。`*` 含 weapp / alipay / swan / tt / qq / kuaishou / h5 / rn |
 
 ## 调用
 
@@ -94,6 +94,8 @@ import IconAlipay from './components/iconfont/IconAlipay';
 <IconFont name="alipay" className="my-icon" style={{ marginRight: 8 }} />
 <IconAlipay size={20} className="my-icon" style={{ marginRight: 8 }} />
 ```
+
+H5 / 小程序 / Taro 支持 `style` 和 `className`。React Native 只支持 `style`。
 
 Taro 3 需要在 `src/app.config.js` 注册：
 
@@ -110,7 +112,3 @@ export default {
 生成文件顶部带 `/* eslint-disable */`，组件用参数默认值而不是 `defaultProps`（React 19 不再给函数组件挂 defaultProps）。类型用 `import type`，避免 `verbatimModuleSyntax` 报未使用的值导入。
 
 SVG 路径很长时，Prettier 仍可能改文件。把 `save_dir` 加进 `.prettierignore` 和 ESLint `ignorePatterns` 即可。
-
-## 兼容命令
-
-旧包的 bin 名都还在：`iconfont-init`、`iconfont-h5`、`iconfont-rn`、`iconfont-taro`、`iconfont-wechat` 等。

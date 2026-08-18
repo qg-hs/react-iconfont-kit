@@ -34,7 +34,7 @@ const generate = defineCommand({
     },
     platform: {
       type: 'string',
-      description: 'h5 | rn | weapp | alipay | swan | tt | qq | kuaishou | taro',
+      description: 'h5 | rn | weapp | alipay | swan | tt | qq | kuaishou | taro（默认 taro）',
       alias: 'p',
     },
   },

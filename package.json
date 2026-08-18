@@ -13,17 +13,7 @@
   },
   "bin": {
     "iconfont": "./dist/cli.js",
-    "iconfont-kit": "./dist/cli.js",
-    "iconfont-init": "./dist/bins/init.js",
-    "iconfont-h5": "./dist/bins/h5.js",
-    "iconfont-rn": "./dist/bins/rn.js",
-    "iconfont-taro": "./dist/bins/taro.js",
-    "iconfont-wechat": "./dist/bins/wechat.js",
-    "iconfont-alipay": "./dist/bins/alipay.js",
-    "iconfont-baidu": "./dist/bins/baidu.js",
-    "iconfont-toutiao": "./dist/bins/toutiao.js",
-    "iconfont-kuaishou": "./dist/bins/kuaishou.js",
-    "iconfont-qq": "./dist/bins/qq.js"
+    "iconfont-kit": "./dist/cli.js"
   },
   "files": [
     "dist",
@@ -53,7 +43,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "tsc && node scripts/chmod-bins.mjs",
+    "build": "rm -rf dist && tsc && node scripts/chmod-bins.mjs",
     "dev": "tsx src/cli.ts",
     "test": "tsx --test src/core/names.test.ts src/core/hex.test.ts src/core/fetchXml.test.ts src/emit/emit.test.ts",
     "prepublishOnly": "npm run build"
