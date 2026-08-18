@@ -1,17 +1,23 @@
-export interface XmlSymbol {
-  $: {
-    viewBox: string;
-    id: string;
-    [key: string]: string;
-  };
-  [tag: string]: unknown;
+export interface SvgNode {
+  name: string;
+  attrs: Record<string, string>;
+  children: SvgNode[];
 }
 
+export interface SvgSymbol {
+  id: string;
+  viewBox: string;
+  children: SvgNode[];
+}
+
+/** Parsed iconfont symbol payload. `svg.symbol` is kept so existing callers still work. */
 export interface XmlData {
   svg: {
-    symbol: XmlSymbol[];
+    symbol: SvgSymbol[];
   };
 }
+
+export type XmlSymbol = SvgSymbol;
 
 export type StandalonePlatform =
   | 'h5'

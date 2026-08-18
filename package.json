@@ -1,6 +1,6 @@
 {
   "name": "react-iconfont-kit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generate React / React Native / Mini Program / Taro icon components from iconfont.cn",
   "type": "module",
   "main": "./dist/index.js",
@@ -53,8 +53,9 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "tsc && node scripts/copy-templates.mjs",
+    "build": "tsc && node scripts/chmod-bins.mjs",
     "dev": "tsx src/cli.ts",
+    "test": "tsx --test src/core/names.test.ts src/core/hex.test.ts src/core/fetchXml.test.ts src/emit/emit.test.ts",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

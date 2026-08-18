@@ -1,66 +1,39 @@
 import { join, resolve } from 'node:path';
 import pc from 'picocolors';
-import type { KitConfig, XmlData, XmlSymbol } from '../../core/types.js';
+import type { KitConfig, SvgSymbol, XmlData } from '../../core/types.js';
 import { emptyDir, ensureDir, writeText } from '../../core/fs.js';
-import { copyTemplate, getTemplate } from '../../core/getTemplate.js';
 import { pascalCase, trimIconPrefix } from '../../core/names.js';
+import { eachChild, renderJsxSvg, RN_SVG_MAP } from '../../core/svg.js';
+import { renderGetIconColor, renderGetIconColorDts } from '../../emit/helper.js';
 import {
-  replaceCases,
-  replaceComponentName,
-  replaceComponentXml,
-  replaceExports,
-  replaceHelper,
-  replaceImports,
-  replaceNames,
-  replaceNamesArray,
-  replaceSingleIconContent,
-  replaceSize,
-  replaceSvgComponents,
-} from '../../core/replace.js';
-import { addJsxAttribute, eachChild } from '../../core/svg.js';
-import { whitespace } from '../../core/whitespace.js';
+  renderRnIndex,
+  renderRnIndexDts,
+  renderRnLocalIcon,
+  renderRnSingleIcon,
+  renderRnSingleIconDts,
+} from '../../emit/rn.js';
+import { renderSwitchCases } from '../../emit/shared.js';
 import { parseLocalSvg } from './parseLocalSvg.js';
 
-const SVG_MAP: Record<string, string> = {
-  path: 'Path',
-  circle: 'Circle',
-  ellipse: 'Ellipse',
-  rect: 'Rect',
-  line: 'Line',
-  polygon: 'Polygon',
-  polyline: 'Polyline',
-  g: 'G',
-  defs: 'Defs',
-  linearGradient: 'LinearGradient',
-  radialGradient: 'RadialGradient',
-  stop: 'Stop',
-  use: 'Use',
-};
-
-const generateCase = (data: XmlSymbol, baseIdent: number): string => {
-  let template = `\n${whitespace(baseIdent)}<Svg viewBox="${data.$.viewBox}" width={size} height={size} {...rest}>\n`;
-
-  const counter = { colorIndex: 0, baseIdent };
-  eachChild(data, (domName, sub) => {
-    const realDomName = SVG_MAP[domName];
-    if (!realDomName) {
-      console.error(pc.red(`Unable to transform dom "${domName}"`));
+const generateCase = (symbol: SvgSymbol): string =>
+  renderJsxSvg(symbol, {
+    indent: 4,
+    tag: 'Svg',
+    sizeExpr: 'size',
+    mapTag: (name) => RN_SVG_MAP[name],
+    onUnknownTag: (name) => {
+      console.error(pc.red(`Unable to transform dom "${name}"`));
       process.exit(1);
-    }
-    template += `${whitespace(baseIdent + 2)}<${realDomName}${addJsxAttribute(domName, sub, counter)}\n${whitespace(baseIdent + 2)}/>\n`;
+    },
   });
 
-  template += `${whitespace(baseIdent)}</Svg>\n`;
-  return template;
-};
-
-const collectSvgComponents = (item: XmlSymbol, useTypescript: boolean): Set<string> => {
+const collectSvgComponents = (item: SvgSymbol, useTypescript: boolean): Set<string> => {
   const current = new Set<string>(['Svg']);
   if (useTypescript) {
     current.add('GProps');
   }
-  eachChild(item, (domName) => {
-    const mapped = SVG_MAP[domName];
+  eachChild(item, (node) => {
+    const mapped = RN_SVG_MAP[node.name];
     if (mapped) {
       current.add(mapped);
     }
@@ -72,11 +45,11 @@ export const generateRN = (data: XmlData, config: KitConfig): void => {
   const localSvg = parseLocalSvg(config);
   const svgComponents = new Set<string>();
   const names: string[] = [];
-  const imports: string[] = [];
+  const components: string[] = [];
+  const entries: Array<{ name: string; component: string }> = [];
   const saveDir = resolve(config.save_dir);
   const jsxExtension = config.use_typescript ? '.tsx' : '.js';
   const jsExtension = config.use_typescript ? '.ts' : '.js';
-  let cases = '';
 
   if (config.use_typescript) {
     svgComponents.add('GProps');
@@ -85,40 +58,39 @@ export const generateRN = (data: XmlData, config: KitConfig): void => {
   ensureDir(saveDir);
   emptyDir(saveDir);
 
-  copyTemplate('rn', `helper${jsExtension}`, join(saveDir, `helper${jsExtension}`));
+  writeText(join(saveDir, `helper${jsExtension}`), renderGetIconColor(config.use_typescript));
   if (!config.use_typescript) {
-    copyTemplate('rn', 'helper.d.ts', join(saveDir, 'helper.d.ts'));
+    writeText(join(saveDir, 'helper.d.ts'), renderGetIconColorDts());
   }
 
-  data.svg.symbol.forEach((item, index) => {
-    const iconId = item.$.id;
-    const iconIdAfterTrim = trimIconPrefix(iconId, config.trim_icon_prefix);
-    const componentName = pascalCase(iconId);
+  for (const item of data.svg.symbol) {
+    const iconIdAfterTrim = trimIconPrefix(item.id, config.trim_icon_prefix);
+    const componentName = pascalCase(item.id);
     const currentSvgComponents = collectSvgComponents(item, config.use_typescript);
 
     names.push(iconIdAfterTrim);
-    imports.push(componentName);
-    cases += `${whitespace(4)}case '${iconIdAfterTrim}':\n`;
-    cases += `${whitespace(6)}return <${componentName} key="${index + 1}" {...rest} />;\n`;
+    components.push(componentName);
+    entries.push({ name: iconIdAfterTrim, component: componentName });
 
-    let singleFile = getTemplate('rn', `SingleIcon${jsxExtension}`);
-    singleFile = replaceSize(singleFile, config.default_icon_size);
-    singleFile = replaceSvgComponents(singleFile, currentSvgComponents);
-    singleFile = replaceComponentName(singleFile, componentName);
-    singleFile = replaceSingleIconContent(singleFile, generateCase(item, 4));
-    singleFile = replaceHelper(singleFile);
-    writeText(join(saveDir, componentName + jsxExtension), singleFile);
+    writeText(
+      join(saveDir, componentName + jsxExtension),
+      renderRnSingleIcon({
+        ts: config.use_typescript,
+        componentName,
+        size: config.default_icon_size,
+        iconJsx: generateCase(item),
+        svgComponents: currentSvgComponents,
+      }),
+    );
 
     if (!config.use_typescript) {
-      let typeDefinitionFile = getTemplate('rn', 'SingleIcon.d.ts');
-      typeDefinitionFile = replaceComponentName(typeDefinitionFile, componentName);
-      writeText(join(saveDir, `${componentName}.d.ts`), typeDefinitionFile);
+      writeText(join(saveDir, `${componentName}.d.ts`), renderRnSingleIconDts(componentName));
     }
 
-    console.log(`${pc.green('√')} Generated icon "${pc.yellow(iconId)}"`);
-  });
+    console.log(`${pc.green('√')} Generated icon "${pc.yellow(item.id)}"`);
+  }
 
-  localSvg.forEach(({ name, svgStr, styleType }, index) => {
+  for (const { name, svgStr, styleType } of localSvg) {
     const componentName = pascalCase(config.trim_icon_prefix) + pascalCase(name);
     const currentSvgComponents = new Set<string>();
     if (config.use_typescript) {
@@ -127,47 +99,42 @@ export const generateRN = (data: XmlData, config: KitConfig): void => {
     currentSvgComponents.add(styleType ? 'SvgCss' : 'SvgXml');
 
     names.push(name);
-    imports.push(componentName);
-    cases += `${whitespace(4)}case '${name}':\n`;
-    cases += `${whitespace(6)}return <${componentName} key="L${index + 1}" {...rest} />;\n`;
+    components.push(componentName);
+    entries.push({ name, component: componentName });
 
-    let singleFile = getTemplate('rn', `LocalSingleIcon${jsxExtension}`);
-    singleFile = replaceSize(singleFile, config.default_icon_size);
-    singleFile = replaceSvgComponents(singleFile, currentSvgComponents);
-    singleFile = replaceComponentName(singleFile, componentName);
-    singleFile = replaceComponentXml(singleFile, `const xml = \`\n${svgStr}\n\``);
-    singleFile = replaceSingleIconContent(
-      singleFile,
-      `\n${whitespace(4)}<${styleType ? 'SvgCss' : 'SvgXml'} xml={xml}  width={size} height={size} {...rest} />\n`,
+    writeText(
+      join(saveDir, componentName + jsxExtension),
+      renderRnLocalIcon({
+        ts: config.use_typescript,
+        componentName,
+        size: config.default_icon_size,
+        svgStr,
+        styleType,
+        svgComponents: currentSvgComponents,
+      }),
     );
-    writeText(join(saveDir, componentName + jsxExtension), singleFile);
 
     if (!config.use_typescript) {
-      let typeDefinitionFile = getTemplate('rn', 'SingleIcon.d.ts');
-      typeDefinitionFile = replaceComponentName(typeDefinitionFile, componentName);
-      writeText(join(saveDir, `${componentName}.d.ts`), typeDefinitionFile);
+      writeText(join(saveDir, `${componentName}.d.ts`), renderRnSingleIconDts(componentName));
     }
 
     console.log(`${pc.green('√')} Generated local icon "${pc.yellow(name)}"`);
-  });
-
-  let iconFile = getTemplate('rn', `Icon${jsxExtension}`);
-  iconFile = replaceSize(iconFile, config.default_icon_size);
-  iconFile = replaceCases(iconFile, cases);
-  iconFile = replaceSvgComponents(iconFile, svgComponents);
-  iconFile = replaceImports(iconFile, imports);
-  iconFile = replaceExports(iconFile, imports);
-
-  if (config.use_typescript) {
-    iconFile = replaceNames(iconFile, names);
-  } else {
-    iconFile = replaceNamesArray(iconFile, names);
-    let typeDefinitionFile = getTemplate('rn', 'Icon.d.ts');
-    typeDefinitionFile = replaceExports(typeDefinitionFile, imports);
-    typeDefinitionFile = replaceNames(typeDefinitionFile, names);
-    writeText(join(saveDir, 'index.d.ts'), typeDefinitionFile);
   }
 
-  writeText(join(saveDir, `index${jsxExtension}`), iconFile);
-  console.log(`\n${pc.green('√')} All icons have putted into dir: ${pc.green(config.save_dir)}\n`);
+  writeText(
+    join(saveDir, `index${jsxExtension}`),
+    renderRnIndex({
+      ts: config.use_typescript,
+      names,
+      components,
+      cases: renderSwitchCases(entries),
+      svgComponents,
+    }),
+  );
+
+  if (!config.use_typescript) {
+    writeText(join(saveDir, 'index.d.ts'), renderRnIndexDts({ names, components }));
+  }
+
+  console.log(`\n${pc.green('√')} All icons have been put into dir: ${pc.green(config.save_dir)}\n`);
 };

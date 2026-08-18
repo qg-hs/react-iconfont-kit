@@ -14,12 +14,26 @@ const DEFAULTS: KitConfig = {
   platforms: [],
 };
 
+export const DEFAULT_CONFIG_FILE = {
+  symbol_url: '请参考 README.md，复制 iconfont.cn 提供的 JS 链接',
+  save_dir: './src/components/iconfont',
+  use_typescript: false,
+  trim_icon_prefix: 'icon',
+  default_icon_size: 18,
+  unit: 'px',
+  use_rpx: true,
+  design_width: 750,
+  local_svgs: '',
+  platforms: '*',
+} as const;
+
 export const ALL_TARO_PLATFORMS: GeneratePlatform[] = [
   'weapp',
   'alipay',
   'swan',
   'tt',
   'qq',
+  'kuaishou',
   'h5',
   'rn',
 ];
@@ -67,7 +81,6 @@ const parsePlatforms = (raw: unknown): GeneratePlatform[] => {
 
 export const loadConfig = (configFilePath = 'iconfont.json'): KitConfig => {
   const targetFile = resolve(configFilePath);
-
   if (!existsSync(targetFile)) {
     console.warn(pc.red(`File "${configFilePath}" doesn't exist, did you forget to generate it?`));
     process.exit(1);

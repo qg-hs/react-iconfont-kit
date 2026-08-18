@@ -4,65 +4,50 @@ import { globSync } from 'tinyglobby';
 import pc from 'picocolors';
 import type { KitConfig, XmlData } from '../../core/types.js';
 import { emptyDir, ensureDir, writeText } from '../../core/fs.js';
-import { getTemplate } from '../../core/getTemplate.js';
 import { trimIconPrefix } from '../../core/names.js';
 import {
-  replaceDesignWidth,
-  replaceIsRpx,
-  replaceNames,
-  replacePlatform,
-  replaceSize,
-} from '../../core/replace.js';
+  renderTaroDummyDts,
+  renderTaroDummyIndex,
+  renderTaroH5Wrapper,
+  renderTaroHelper,
+  renderTaroHelperDts,
+  renderTaroPlatformWrapper,
+  renderTaroRnWrapper,
+} from '../../emit/taro.js';
 import { generateH5 } from '../h5/generate.js';
 import { generateMP, MP_PLATFORMS } from '../mp/generate.js';
 import { generateRN } from '../rn/generate.js';
 
 const getIconNames = (data: XmlData, config: KitConfig): string[] =>
-  data.svg.symbol.map((item) => trimIconPrefix(item.$.id, config.trim_icon_prefix));
+  data.svg.symbol.map((item) => trimIconPrefix(item.id, config.trim_icon_prefix));
 
-const replaceRelativePath = (content: string, saveDir: string): string => {
-  const relativePath = relative(resolve('src'), resolve(saveDir)).replace(/\\/g, '/');
-  return content.replace(/#relativePath#/g, relativePath);
-};
+const relativeFromSrc = (saveDir: string): string => relative(resolve('src'), resolve(saveDir)).replace(/\\/g, '/');
 
 const generateUsingComponent = (config: KitConfig, names: string[], platform?: string): void => {
   const saveDir = resolve(config.save_dir);
   const jsxExtension = config.use_typescript ? '.tsx' : '.js';
+  const wrapperOpts = {
+    ts: config.use_typescript,
+    names,
+    size: config.default_icon_size,
+    useRpx: config.use_rpx,
+    designWidth: config.design_width || 750,
+  };
 
   let iconFile: string;
-  if (platform) {
-    const specific = `index.${platform}${jsxExtension}`;
-    try {
-      iconFile = getTemplate('taro', specific);
-    } catch {
-      iconFile = getTemplate('taro', `index.platform${jsxExtension}`);
-    }
+  if (platform === 'h5') {
+    iconFile = renderTaroH5Wrapper(wrapperOpts);
+  } else if (platform === 'rn') {
+    iconFile = renderTaroRnWrapper(wrapperOpts);
+  } else if (platform) {
+    iconFile = renderTaroPlatformWrapper(wrapperOpts);
   } else {
-    iconFile = getTemplate('taro', `index${jsxExtension}`);
+    iconFile = renderTaroDummyIndex({ ts: config.use_typescript, names });
+    if (!config.use_typescript) {
+      writeText(join(saveDir, 'index.d.ts'), renderTaroDummyDts(names));
+    }
   }
 
-  iconFile = replaceNames(iconFile, names);
-  iconFile = replaceSize(iconFile, config.default_icon_size);
-
-  if (platform === 'h5' && config.use_rpx) {
-    iconFile = replaceDesignWidth(iconFile, config.design_width || 750);
-  }
-
-  iconFile = replaceIsRpx(iconFile, config.use_rpx);
-  if (platform) {
-    iconFile = replacePlatform(iconFile, platform);
-  }
-
-  if (!platform && !config.use_typescript) {
-    let definitionFile = getTemplate('taro', 'index.d.ts');
-    definitionFile = replaceNames(definitionFile, names);
-    writeText(join(saveDir, 'index.d.ts'), definitionFile);
-  }
-
-  let helperFile = getTemplate('taro', 'helper.js');
-  helperFile = replaceRelativePath(helperFile, config.save_dir);
-  writeText(join(saveDir, 'helper.js'), helperFile);
-  writeText(join(saveDir, 'helper.d.ts'), getTemplate('taro', 'helper.d.ts'));
   writeText(join(saveDir, `index${platform ? `.${platform}` : ''}${jsxExtension}`), iconFile);
 };
 
@@ -70,6 +55,12 @@ const withSaveDir = (config: KitConfig, platform: string): KitConfig => ({
   ...config,
   save_dir: join(config.save_dir, platform),
 });
+
+const stripNestedDts = (dir: string): void => {
+  for (const file of globSync('**/*.d.ts', { cwd: resolve(dir), absolute: true })) {
+    unlinkSync(file);
+  }
+};
 
 export const generateTaro = (data: XmlData, config: KitConfig): void => {
   if (!config.platforms.length) {
@@ -82,6 +73,8 @@ export const generateTaro = (data: XmlData, config: KitConfig): void => {
   emptyDir(saveDir);
 
   const iconNames = getIconNames(data, config);
+  writeText(join(saveDir, 'helper.js'), renderTaroHelper(relativeFromSrc(config.save_dir)));
+  writeText(join(saveDir, 'helper.d.ts'), renderTaroHelperDts());
   generateUsingComponent(config, iconNames);
 
   for (const platform of config.platforms) {
@@ -94,14 +87,10 @@ export const generateTaro = (data: XmlData, config: KitConfig): void => {
 
     if (platform === 'h5') {
       generateH5(data, { ...nested, unit: config.use_rpx ? 'rem' : 'px' });
-      for (const file of globSync('**/*.d.ts', { cwd: resolve(nested.save_dir), absolute: true })) {
-        unlinkSync(file);
-      }
+      stripNestedDts(nested.save_dir);
     } else if (platform === 'rn') {
       generateRN(data, nested);
-      for (const file of globSync('**/*.d.ts', { cwd: resolve(nested.save_dir), absolute: true })) {
-        unlinkSync(file);
-      }
+      stripNestedDts(nested.save_dir);
     } else if (MP_PLATFORMS[platform]) {
       generateMP(data, nested, platform);
     } else {

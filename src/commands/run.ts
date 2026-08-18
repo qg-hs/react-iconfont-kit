@@ -1,9 +1,8 @@
-import { copyFileSync, existsSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import pc from 'picocolors';
 import { fetchXml } from '../core/fetchXml.js';
-import { assertSource, canonicalizePlatform, loadConfig } from '../core/getConfig.js';
-import { getDefaultConfigPath } from '../core/getTemplate.js';
+import { assertSource, canonicalizePlatform, DEFAULT_CONFIG_FILE, loadConfig } from '../core/getConfig.js';
 import type { GeneratePlatform, KitConfig, XmlData } from '../core/types.js';
 import { generateH5 } from '../platforms/h5/generate.js';
 import { generateMP, MP_PLATFORMS } from '../platforms/mp/generate.js';
@@ -17,11 +16,11 @@ export const runInit = (outputPath = 'iconfont.json'): void => {
   }
   const targetFile = resolve(output);
   if (existsSync(targetFile)) {
-    console.error(pc.red(`File "${output}" was created before.`));
+    console.error(pc.red(`File "${output}" already exists.`));
     process.exit(1);
   }
-  copyFileSync(getDefaultConfigPath(), targetFile);
-  console.log(pc.green(`File "${output}" is created now. We recommend you add it to version control.`));
+  writeFileSync(targetFile, `${JSON.stringify(DEFAULT_CONFIG_FILE, null, 2)}\n`);
+  console.log(pc.green(`Created "${output}". Add it to version control.`));
 };
 
 const emptyXml = (): XmlData => ({ svg: { symbol: [] } });
