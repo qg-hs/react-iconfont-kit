@@ -1,0 +1,12 @@
+{
+  "symbol_url": "请参考 README.md，复制 iconfont.cn 提供的 JS 链接",
+  "save_dir": "./src/components/iconfont",
+  "use_typescript": false,
+  "trim_icon_prefix": "icon",
+  "default_icon_size": 18,
+  "unit": "px",
+  "use_rpx": true,
+  "design_width": 750,
+  "local_svgs": "",
+  "platforms": "*"
+}
